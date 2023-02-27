@@ -1,8 +1,6 @@
 const express = require('express');
 const path = require('path');
-const fs = require('fs');
-const { v4: uuidv4 } = require('uuid');
-
+const apiRoutes = require('./routes/index.js');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -15,49 +13,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
 // API routes
-app.get('/api/notes', (req, res) => {
-  // Read the db.json file and return all saved notes as JSON
-  const notesData = JSON.parse(fs.readFileSync('./db/db.json'));
-  res.json(notesData);
-});
-
-app.post('/api/notes', (req, res) => {
-  // Add a new note to the db.json file with a unique id
-  const newNote = req.body;
-  newNote.id = uuidv4();
-  const notesData = JSON.parse(fs.readFileSync('./db/db.json'));
-  notesData.push(newNote);
-  fs.writeFileSync('./db/db.json', JSON.stringify(notesData));
-  res.json(notesData);
-});
-
-// Delete a note with a given id
-app.delete("/api/notes/:id", (req, res) => {
-  const id = req.params.id;
-  fs.readFile("./db/db.json", "utf8", (err, data) => {
-    if (err) {
-      console.log(err);
-      return res.status(500).json({ message: "Server error" });
-    }
-    const notes = JSON.parse(data);
-
-    // use the filter method to create a new array without the deleted note ID
-    const updatedNotes = notes.filter((note) => note.id !== id);
-    if (notes.length === updatedNotes.length) {
-      return res.status(404).json({ message: "Note not found" });
-    }
-
-    //rewrite the db.json file with the updated notes array
-    fs.writeFile("./db/db.json", JSON.stringify(updatedNotes), (err) => {
-      if (err) {
-        console.log(err);
-        return res.status(500).json({ message: "Server error" });
-      }
-      return res.status(200).json({ message: `Note deleted successfully with ID: ${id}`});
-    });
-  });
-});
-
+app.use('/api', apiRoutes);
 
 // HTML routes
 app.get("/", (req, res) => {
@@ -68,6 +24,7 @@ app.get('/notes', (req, res) => {
   res.sendFile(path.join(__dirname, './public/notes.html'));
 });
 
+// wildcard route If no matching route is found default to index
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, './public/index.html'));
 });
