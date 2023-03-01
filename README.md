@@ -37,7 +37,7 @@ npm install
 ## Usage
 
 To view this application,the following image shows the landing page of the application, or click on the page link that demonstrates the functionality of this project: 
-https://hidden-crag-94023.herokuapp.com/notes
+https://hidden-crag-94023.herokuapp.com
 
 ![Note-Taker](./assets/images/landing.png)
 ![Note-Taker](./assets/images/notes.png)
